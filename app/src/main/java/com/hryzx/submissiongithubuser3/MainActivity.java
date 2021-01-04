@@ -18,6 +18,8 @@ import com.hryzx.submissiongithubuser3.adapter.ListUserAdapter;
 import com.hryzx.submissiongithubuser3.databinding.ActivityMainBinding;
 import com.hryzx.submissiongithubuser3.model.MainViewModel;
 
+import java.util.Objects;
+
 public class MainActivity extends AppCompatActivity {
     private ListUserAdapter listUserAdapter;
     private ActivityMainBinding binding;
@@ -30,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
+
+        Objects.requireNonNull(getSupportActionBar()).setTitle("GitHub User");
 
         binding.rvUsers.setLayoutManager(new LinearLayoutManager(this));
         listUserAdapter = new ListUserAdapter();

@@ -1,9 +1,14 @@
 package com.hryzx.submissiongithubuser3;
 
+import android.content.Context;
 import android.content.Intent;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -12,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.hryzx.submissiongithubuser3.adapter.ListUserAdapter;
+import com.hryzx.submissiongithubuser3.database.UserContract;
 import com.hryzx.submissiongithubuser3.database.UserHelper;
 import com.hryzx.submissiongithubuser3.databinding.ActivityFavoritesBinding;
 import com.hryzx.submissiongithubuser3.entity.User;
@@ -19,6 +25,8 @@ import com.hryzx.submissiongithubuser3.helper.MappingHelper;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 interface LoadUsersCallback {
     void preExecute();
@@ -30,7 +38,6 @@ public class FavoritesActivity extends AppCompatActivity implements LoadUsersCal
     private static final String EXTRA_STATE = "EXTRA_STATE";
     private ListUserAdapter listUserAdapter;
     private ActivityFavoritesBinding binding;
-    private UserHelper userHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,11 +58,15 @@ public class FavoritesActivity extends AppCompatActivity implements LoadUsersCal
         binding.rvFavUsers.setAdapter(listUserAdapter);
         binding.rvFavUsers.setHasFixedSize(true);
 
-        userHelper = UserHelper.getInstance(getApplicationContext());
-        userHelper.open();
+        HandlerThread handlerThread = new HandlerThread("DataObserver");
+        handlerThread.start();
+        Handler handler = new Handler(handlerThread.getLooper());
+
+        DataObserver myObserver = new DataObserver(handler, this);
+        getContentResolver().registerContentObserver(UserContract.UserColumns.CONTENT_URI, true, myObserver);
 
         if (savedInstanceState == null) {
-            new LoadUsersAsync(userHelper, this).execute();
+            new LoadUsersAsync(this, this).execute();
         } else {
             ArrayList<User> list = savedInstanceState.getParcelableArrayList(EXTRA_STATE);
             setStatus(0, null);
@@ -104,55 +115,67 @@ public class FavoritesActivity extends AppCompatActivity implements LoadUsersCal
     private void setStatus(int status, String message) {
         switch (status) {
             case 0: // loading
-                binding.favProgressbar.setVisibility(View.VISIBLE);
-                binding.rvFavUsers.setVisibility(View.INVISIBLE);
-                binding.tvFavStatus.setVisibility(View.INVISIBLE);
+                runOnUiThread(() -> {
+                    binding.favProgressbar.setVisibility(View.VISIBLE);
+                    binding.rvFavUsers.setVisibility(View.INVISIBLE);
+                    binding.tvFavStatus.setVisibility(View.INVISIBLE);
+                });
                 break;
             case 1: // stop loading
-                binding.favProgressbar.setVisibility(View.INVISIBLE);
-                binding.rvFavUsers.setVisibility(View.VISIBLE);
-                binding.tvFavStatus.setVisibility(View.INVISIBLE);
+                runOnUiThread(() -> {
+                    binding.favProgressbar.setVisibility(View.INVISIBLE);
+                    binding.rvFavUsers.setVisibility(View.VISIBLE);
+                    binding.tvFavStatus.setVisibility(View.INVISIBLE);
+                });
                 break;
             case 2: // message
-                binding.favProgressbar.setVisibility(View.INVISIBLE);
-                binding.rvFavUsers.setVisibility(View.INVISIBLE);
-                binding.tvFavStatus.setVisibility(View.VISIBLE);
-                binding.tvFavStatus.setText(message);
+                runOnUiThread(() -> {
+                    binding.favProgressbar.setVisibility(View.INVISIBLE);
+                    binding.rvFavUsers.setVisibility(View.INVISIBLE);
+                    binding.tvFavStatus.setVisibility(View.VISIBLE);
+                    binding.tvFavStatus.setText(message);
+                });
                 break;
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        userHelper.close();
-    }
-
-    private static class LoadUsersAsync extends AsyncTask<Void, Void, ArrayList<User>> {
-        private final WeakReference<UserHelper> weakUserHelper;
+    private static class LoadUsersAsync {
+        private final WeakReference<Context> weakContext;
         private final WeakReference<LoadUsersCallback> weakCallback;
 
-        private LoadUsersAsync(UserHelper userHelper, LoadUsersCallback callback) {
-            weakUserHelper = new WeakReference<>(userHelper);
+        private LoadUsersAsync(Context context, LoadUsersCallback callback) {
+            weakContext = new WeakReference<>(context);
             weakCallback = new WeakReference<>(callback);
         }
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
+        void execute() {
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            Handler handler = new Handler(Looper.getMainLooper());
+
             weakCallback.get().preExecute();
+            executor.execute(() -> {
+                Context context = weakContext.get();
+                Cursor dataCursor = context.getContentResolver().query(UserContract.UserColumns.CONTENT_URI, null, null, null, null);
+                ArrayList<User> users = MappingHelper.mapCursorToArrayList(dataCursor);
+
+                handler.post(() -> weakCallback.get().postExecute(users));
+            });
+        }
+    }
+
+    public static class DataObserver extends ContentObserver {
+
+        final Context context;
+
+        public DataObserver(Handler handler, Context context) {
+            super(handler);
+            this.context = context;
         }
 
         @Override
-        protected ArrayList<User> doInBackground(Void... voids) {
-            Cursor dataCursor = weakUserHelper.get().queryAll();
-            return MappingHelper.mapCursorToArrayList(dataCursor);
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<User> users) {
-            super.onPostExecute(users);
-            weakCallback.get().postExecute(users);
+        public void onChange(boolean selfChange) {
+            super.onChange(selfChange);
+            new LoadUsersAsync(context, (LoadUsersCallback) context).execute();
         }
     }
 }

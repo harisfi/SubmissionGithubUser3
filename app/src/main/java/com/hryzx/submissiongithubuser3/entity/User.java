@@ -15,6 +15,7 @@ public class User implements Parcelable {
             return new User[size];
         }
     };
+    private int id;
     private String url;
     private String name;
     private String username;
@@ -34,6 +35,7 @@ public class User implements Parcelable {
     }
 
     private User(Parcel in) {
+        this.id = in.readInt();
         this.url = in.readString();
         this.name = in.readString();
         this.username = in.readString();
@@ -48,6 +50,14 @@ public class User implements Parcelable {
         this.company = in.readString();
         this.blog = in.readString();
         this.email = in.readString();
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getRepos() {
@@ -169,6 +179,7 @@ public class User implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.id);
         dest.writeString(this.url);
         dest.writeString(this.name);
         dest.writeString(this.username);

@@ -1,11 +1,14 @@
 package com.hryzx.submissiongithubuser3.database;
 
+import android.net.Uri;
 import android.provider.BaseColumns;
 
 public class UserContract {
-    static String TABLE_NAME = "users";
+    public static final String AUTHORITY = "com.hryzx.submissiongithubuser3";
+    private static final String SCHEME = "content";
 
     public static final class UserColumns implements BaseColumns {
+        public static final String TABLE_NAME = "users";
         public static final String URL = "url";
         public static final String NAME = "name";
         public static final String USERNAME = "username";
@@ -20,5 +23,11 @@ public class UserContract {
         public static final String COMPANY = "company";
         public static final String BLOG = "blog";
         public static final String EMAIL = "email";
+
+        // content://com.dicoding.hryzx.submissiongithubuser3/users
+        public static final Uri CONTENT_URI = new Uri.Builder().scheme(SCHEME)
+                .authority(AUTHORITY)
+                .appendPath(TABLE_NAME)
+                .build();
     }
 }

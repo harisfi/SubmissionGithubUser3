@@ -6,6 +6,7 @@ import com.hryzx.submissiongithubuser3.entity.User;
 
 import java.util.ArrayList;
 
+import static android.provider.BaseColumns._ID;
 import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.BLOG;
 import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.COMPANY;
 import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.DESCRIPTION;
@@ -26,6 +27,8 @@ public class MappingHelper {
         ArrayList<User> users = new ArrayList<>();
         while (userCursor.moveToNext()) {
             User user = new User();
+
+            user.setId(userCursor.getInt(userCursor.getColumnIndexOrThrow(_ID)));
             user.setUrl(userCursor.getString(userCursor.getColumnIndexOrThrow(URL)));
             user.setName(userCursor.getString(userCursor.getColumnIndexOrThrow(NAME)));
             user.setUsername(userCursor.getString(userCursor.getColumnIndexOrThrow(USERNAME)));
@@ -43,6 +46,29 @@ public class MappingHelper {
             users.add(user);
         }
         return users;
+    }
+
+    public static User mapCursorToObject(Cursor userCursor) {
+        userCursor.moveToFirst();
+        User user = new User();
+
+        user.setId(userCursor.getInt(userCursor.getColumnIndexOrThrow(_ID)));
+        user.setUrl(userCursor.getString(userCursor.getColumnIndexOrThrow(URL)));
+        user.setName(userCursor.getString(userCursor.getColumnIndexOrThrow(NAME)));
+        user.setUsername(userCursor.getString(userCursor.getColumnIndexOrThrow(USERNAME)));
+        user.setDescription(userCursor.getString(userCursor.getColumnIndexOrThrow(DESCRIPTION)));
+        user.setLocation(userCursor.getString(userCursor.getColumnIndexOrThrow(LOCATION)));
+        user.setPhoto(userCursor.getString(userCursor.getColumnIndexOrThrow(PHOTO)));
+        user.setFollowing(userCursor.getString(userCursor.getColumnIndexOrThrow(FOLLOWING)));
+        user.setFollowers(userCursor.getString(userCursor.getColumnIndexOrThrow(FOLLOWERS)));
+        user.setFollowers_url(userCursor.getString(userCursor.getColumnIndexOrThrow(FOLLOWERS_URL)));
+        user.setFollowing_url(userCursor.getString(userCursor.getColumnIndexOrThrow(FOLLOWING_URL)));
+        user.setRepos(userCursor.getString(userCursor.getColumnIndexOrThrow(REPOS)));
+        user.setCompany(userCursor.getString(userCursor.getColumnIndexOrThrow(COMPANY)));
+        user.setBlog(userCursor.getString(userCursor.getColumnIndexOrThrow(BLOG)));
+        user.setEmail(userCursor.getString(userCursor.getColumnIndexOrThrow(EMAIL)));
+
+        return user;
     }
 
 }

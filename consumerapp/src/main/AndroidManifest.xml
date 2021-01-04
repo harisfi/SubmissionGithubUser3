@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.hryzx.consumerapp">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="com.hryzx.submissiongithubuser3.READ_DATABASE" android:protectionLevel="normal"/>
+    <uses-permission android:name="com.hryzx.submissiongithubuser3.WRITE_DATABASE" android:protectionLevel="normal"/>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.ConsumerApp"
+        android:usesCleartextTraffic="true">
+        <receiver
+            android:name=".AlarmReceiver"
+            android:enabled="true"
+            android:exported="true" />
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".DetailActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".FavoritesActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".SettingsActivity"
+            android:parentActivityName=".MainActivity" />
+    </application>
+
+    <queries>
+        <package android:name="com.hryzx.submissiongithubuser3" />
+    </queries>
+
+</manifest>

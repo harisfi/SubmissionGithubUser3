@@ -2,11 +2,14 @@ package com.hryzx.submissiongithubuser3;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
@@ -15,39 +18,27 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.hryzx.submissiongithubuser3.adapter.SectionsPagerAdapter;
+import com.hryzx.submissiongithubuser3.database.UserContract;
 import com.hryzx.submissiongithubuser3.database.UserContract.UserColumns;
-import com.hryzx.submissiongithubuser3.database.UserHelper;
 import com.hryzx.submissiongithubuser3.databinding.ActivityDetailBinding;
 import com.hryzx.submissiongithubuser3.entity.User;
+import com.hryzx.submissiongithubuser3.helper.MappingHelper;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 import cz.msebera.android.httpclient.Header;
 
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.BLOG;
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.COMPANY;
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.DESCRIPTION;
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.EMAIL;
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.FOLLOWERS;
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.FOLLOWERS_URL;
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.FOLLOWING;
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.FOLLOWING_URL;
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.LOCATION;
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.NAME;
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.PHOTO;
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.REPOS;
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.URL;
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.USERNAME;
-
 public class DetailActivity extends AppCompatActivity {
     public static final String EXTRA_USER = "extra_user";
     private ActivityDetailBinding binding;
+    private boolean isFav = false;
+    private Uri uriWithUsername;
     private User user;
-    private UserHelper userHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,31 +51,15 @@ public class DetailActivity extends AppCompatActivity {
             getSupportActionBar().setHomeButtonEnabled(true);
         }
 
-        userHelper = UserHelper.getInstance(getApplicationContext());
-        userHelper.open();
-
         user = getIntent().getParcelableExtra(EXTRA_USER);
+        // content://com.hryzx.submissiongithubuser3/users/username
+        uriWithUsername = Uri.withAppendedPath(UserColumns.CONTENT_URI, user.getUsername());
+        Cursor cursor = getContentResolver().query(uriWithUsername, null, null, null, null);
+        isFav = (cursor != null && cursor.getCount() > 0);
 
-        if (userHelper.isExist(user.getUsername())) {
+        if (isFav) {
             showLoading(true);
-            Cursor c = userHelper.queryByUsername(user.getUsername());
-            c.moveToFirst();
-
-            user.setUrl(c.getString(c.getColumnIndexOrThrow(URL)));
-            user.setName(c.getString(c.getColumnIndexOrThrow(NAME)));
-            user.setUsername(c.getString(c.getColumnIndexOrThrow(USERNAME)));
-            user.setDescription(c.getString(c.getColumnIndexOrThrow(DESCRIPTION)));
-            user.setLocation(c.getString(c.getColumnIndexOrThrow(LOCATION)));
-            user.setPhoto(c.getString(c.getColumnIndexOrThrow(PHOTO)));
-            user.setFollowing(c.getString(c.getColumnIndexOrThrow(FOLLOWING)));
-            user.setFollowers(c.getString(c.getColumnIndexOrThrow(FOLLOWERS)));
-            user.setFollowers_url(c.getString(c.getColumnIndexOrThrow(FOLLOWERS_URL)));
-            user.setFollowing_url(c.getString(c.getColumnIndexOrThrow(FOLLOWING_URL)));
-            user.setRepos(c.getString(c.getColumnIndexOrThrow(REPOS)));
-            user.setCompany(c.getString(c.getColumnIndexOrThrow(COMPANY)));
-            user.setBlog(c.getString(c.getColumnIndexOrThrow(BLOG)));
-            user.setEmail(c.getString(c.getColumnIndexOrThrow(EMAIL)));
-
+            user = MappingHelper.mapCursorToObject(cursor);
             Glide.with(this)
                     .load(user.getPhoto())
                     .apply(new RequestOptions().override(86, 86))
@@ -95,20 +70,20 @@ public class DetailActivity extends AppCompatActivity {
             binding.tvDetailUsername.setText(user.getUsername());
             setupTab(user);
             getSupportActionBar().setTitle(user.getUsername());
-            binding.floatingActionButton.setImageDrawable(getDrawable(R.drawable.ic_baseline_favorite_24));
             showLoading(false);
-            Snackbar.make(binding.getRoot(), getString(R.string.offline_data), Snackbar.LENGTH_SHORT).show();
+            binding.floatingActionButton.setImageDrawable(getDrawable(R.drawable.ic_baseline_favorite_24));
+            cursor.close();
         } else {
             getUserData();
             binding.floatingActionButton.setImageDrawable(getDrawable(R.drawable.ic_baseline_favorite_border_24));
         }
 
         binding.floatingActionButton.setOnClickListener(v -> {
-            if (!userHelper.isExist(user.getUsername())) {
+            if (!isFav) {
                 ContentValues values = new ContentValues();
                 values.put(UserColumns.URL, user.getUrl());
                 values.put(UserColumns.NAME, user.getName());
-                values.put(USERNAME, user.getUsername());
+                values.put(UserColumns.USERNAME, user.getUsername());
                 values.put(UserColumns.DESCRIPTION, user.getDescription());
                 values.put(UserColumns.LOCATION, user.getLocation());
                 values.put(UserColumns.PHOTO, user.getPhoto());
@@ -121,21 +96,15 @@ public class DetailActivity extends AppCompatActivity {
                 values.put(UserColumns.BLOG, user.getBlog());
                 values.put(UserColumns.EMAIL, user.getEmail());
 
-                long result = userHelper.insert(values);
-                if (result > 0) {
-                    Snackbar.make(v, getString(R.string.added_to_favorites), Snackbar.LENGTH_SHORT).show();
-                    binding.floatingActionButton.setImageDrawable(getDrawable(R.drawable.ic_baseline_favorite_24));
-                } else {
-                    Snackbar.make(v, getString(R.string.cannot_add_to_favorites), Snackbar.LENGTH_SHORT).show();
-                }
+                // content://com.hryzx.submissiongithubuser3/users/
+                getContentResolver().insert(UserColumns.CONTENT_URI, values);
+                Snackbar.make(v, getString(R.string.added_to_favorites), Snackbar.LENGTH_SHORT).show();
+                binding.floatingActionButton.setImageDrawable(getDrawable(R.drawable.ic_baseline_favorite_24));
             } else {
-                long result = userHelper.deleteByUsername(user.getUsername());
-                if (result > 0) {
-                    Snackbar.make(v, getString(R.string.removed_from_favorites), Snackbar.LENGTH_SHORT).show();
-                    binding.floatingActionButton.setImageDrawable(getDrawable(R.drawable.ic_baseline_favorite_border_24));
-                } else {
-                    Snackbar.make(v, getString(R.string.cannot_remove_from_favorites), Snackbar.LENGTH_SHORT).show();
-                }
+                // content://com.hryzx.submissiongithubuser3/users/
+                getContentResolver().delete(uriWithUsername, null, null);
+                Snackbar.make(v, getString(R.string.removed_from_favorites), Snackbar.LENGTH_SHORT).show();
+                binding.floatingActionButton.setImageDrawable(getDrawable(R.drawable.ic_baseline_favorite_border_24));
             }
         });
     }
@@ -238,5 +207,6 @@ public class DetailActivity extends AppCompatActivity {
         binding.tabDetail.setVisibility(state ? View.INVISIBLE : View.VISIBLE);
         binding.viewLine.setVisibility(state ? View.INVISIBLE : View.VISIBLE);
         binding.viewPager.setVisibility(state ? View.INVISIBLE : View.VISIBLE);
+        binding.floatingActionButton.setVisibility(state ? View.INVISIBLE : View.VISIBLE);
     }
 }

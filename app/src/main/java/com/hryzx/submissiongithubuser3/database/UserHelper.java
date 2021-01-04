@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import static android.provider.BaseColumns._ID;
-import static com.hryzx.submissiongithubuser3.database.UserContract.TABLE_NAME;
+import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.TABLE_NAME;
 import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.USERNAME;
 
 public class UserHelper {
@@ -53,18 +53,6 @@ public class UserHelper {
                 _ID + " DESC");
     }
 
-    public Cursor queryById(String id) {
-        return database.query(
-                DATABASE_TABLE,
-                null,
-                _ID + " = ?",
-                new String[]{id},
-                null,
-                null,
-                null,
-                null);
-    }
-
     public Cursor queryByUsername(String username) {
         return database.query(
                 DATABASE_TABLE,
@@ -85,24 +73,7 @@ public class UserHelper {
         return database.update(DATABASE_TABLE, values, _ID + " = ?", new String[]{id});
     }
 
-    public int deleteById(String id) {
-        return database.delete(DATABASE_TABLE, _ID + " = ?", new String[]{id});
-    }
-
     public int deleteByUsername(String username) {
         return database.delete(DATABASE_TABLE, USERNAME + " = ?", new String[]{username});
-    }
-
-    public boolean isExist(String username) {
-        Cursor c = database.query(DATABASE_TABLE,
-                null,
-                USERNAME + " = ?",
-                new String[]{username},
-                null,
-                null,
-                null,
-                null);
-
-        return c.getCount() > 0;
     }
 }
