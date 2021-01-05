@@ -20,6 +20,9 @@ import com.hryzx.consumerapp.model.MainViewModel;
 
 import java.util.Objects;
 
+import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
+import static android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
+
 public class MainActivity extends AppCompatActivity {
     private ListUserAdapter listUserAdapter;
     private ActivityMainBinding binding;
@@ -56,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         listUserAdapter.setOnItemClickCallback(data -> {
             Intent detailIntent = new Intent(MainActivity.this, DetailActivity.class);
             detailIntent.putExtra(DetailActivity.EXTRA_USER, data);
+            detailIntent.addFlags(FLAG_GRANT_READ_URI_PERMISSION|FLAG_GRANT_WRITE_URI_PERMISSION);
             startActivity(detailIntent);
         });
     }
