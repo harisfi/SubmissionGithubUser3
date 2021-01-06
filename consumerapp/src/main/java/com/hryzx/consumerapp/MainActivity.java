@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         listUserAdapter.setOnItemClickCallback(data -> {
             Intent detailIntent = new Intent(MainActivity.this, DetailActivity.class);
             detailIntent.putExtra(DetailActivity.EXTRA_USER, data);
-            detailIntent.addFlags(FLAG_GRANT_READ_URI_PERMISSION|FLAG_GRANT_WRITE_URI_PERMISSION);
+            detailIntent.addFlags(FLAG_GRANT_READ_URI_PERMISSION | FLAG_GRANT_WRITE_URI_PERMISSION);
             startActivity(detailIntent);
         });
     }

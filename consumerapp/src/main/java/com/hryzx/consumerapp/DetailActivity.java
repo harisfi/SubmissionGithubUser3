@@ -33,7 +33,7 @@ public class DetailActivity extends AppCompatActivity {
     public static final String EXTRA_USER = "extra_user";
     private ActivityDetailBinding binding;
     private boolean isFav = false;
-    private Uri uriWithUsername;
+    private Uri uriWithId;
     private User user;
 
     @Override
@@ -49,8 +49,8 @@ public class DetailActivity extends AppCompatActivity {
 
         user = getIntent().getParcelableExtra(EXTRA_USER);
         // content://com.hryzx.submissiongithubuser3/users/username
-        uriWithUsername = Uri.withAppendedPath(UserColumns.CONTENT_URI, user.getUsername());
-        Cursor cursor = getContentResolver().query(uriWithUsername, null, null, null, null);
+        uriWithId = Uri.withAppendedPath(UserColumns.CONTENT_URI, String.valueOf(user.getId()));
+        Cursor cursor = getContentResolver().query(uriWithId, null, null, null, null);
         isFav = (cursor != null && cursor.getCount() > 0);
 
         if (isFav) {
@@ -77,6 +77,7 @@ public class DetailActivity extends AppCompatActivity {
         binding.floatingActionButton.setOnClickListener(v -> {
             if (!isFav) {
                 ContentValues values = new ContentValues();
+                values.put(UserColumns.ID, user.getId());
                 values.put(UserColumns.URL, user.getUrl());
                 values.put(UserColumns.NAME, user.getName());
                 values.put(UserColumns.USERNAME, user.getUsername());
@@ -98,7 +99,7 @@ public class DetailActivity extends AppCompatActivity {
                 binding.floatingActionButton.setImageDrawable(getDrawable(R.drawable.ic_baseline_favorite_24));
             } else {
                 // content://com.hryzx.submissiongithubuser3/users/
-                getContentResolver().delete(uriWithUsername, null, null);
+                getContentResolver().delete(uriWithId, null, null);
                 Snackbar.make(v, getString(R.string.removed_from_favorites), Snackbar.LENGTH_SHORT).show();
                 binding.floatingActionButton.setImageDrawable(getDrawable(R.drawable.ic_baseline_favorite_border_24));
             }
@@ -122,6 +123,7 @@ public class DetailActivity extends AppCompatActivity {
                     User userItem = new User();
 
                     userItem.setUrl(user.getUrl());
+                    userItem.setId(item.getInt("id"));
                     userItem.setUsername(item.getString("login"));
                     userItem.setPhoto(item.getString("avatar_url"));
                     userItem.setFollowers_url(item.getString("followers_url"));

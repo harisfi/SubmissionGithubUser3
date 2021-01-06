@@ -38,11 +38,9 @@ public class FollowingViewModel extends ViewModel {
                     for (int i = 0; i < items.length(); i++) {
                         JSONObject item = items.getJSONObject(i);
                         User user = new User();
+                        user.setId(item.getInt("id"));
                         user.setUrl(item.getString("url"));
-                        user.setName(item.getString("login"));
                         user.setUsername(item.getString("login"));
-                        user.setDescription(item.getString("login"));
-                        user.setLocation(item.getString("login"));
                         user.setPhoto(item.getString("avatar_url"));
                         listItems.add(user);
                     }

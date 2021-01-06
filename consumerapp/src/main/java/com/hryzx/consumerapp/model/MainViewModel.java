@@ -39,6 +39,7 @@ public class MainViewModel extends ViewModel {
                     for (int i = 0; i < items.length(); i++) {
                         JSONObject item = items.getJSONObject(i);
                         User user = new User();
+                        user.setId(item.getInt("id"));
                         user.setUrl(item.getString("url"));
                         user.setUsername(item.getString("login"));
                         user.setPhoto(item.getString("avatar_url"));

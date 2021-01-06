@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.Cursor;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -18,7 +17,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.hryzx.submissiongithubuser3.adapter.ListUserAdapter;
 import com.hryzx.submissiongithubuser3.database.UserContract;
-import com.hryzx.submissiongithubuser3.database.UserHelper;
 import com.hryzx.submissiongithubuser3.databinding.ActivityFavoritesBinding;
 import com.hryzx.submissiongithubuser3.entity.User;
 import com.hryzx.submissiongithubuser3.helper.MappingHelper;

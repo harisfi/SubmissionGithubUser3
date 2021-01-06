@@ -25,7 +25,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     " %s TEXT," +
                     " %s TEXT)",
             UserColumns.TABLE_NAME,
-            UserColumns._ID,
+            UserColumns.ID,
             UserColumns.URL,
             UserColumns.NAME,
             UserColumns.USERNAME,

@@ -6,21 +6,7 @@ import com.hryzx.submissiongithubuser3.entity.User;
 
 import java.util.ArrayList;
 
-import static android.provider.BaseColumns._ID;
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.BLOG;
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.COMPANY;
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.DESCRIPTION;
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.EMAIL;
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.FOLLOWERS;
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.FOLLOWERS_URL;
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.FOLLOWING;
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.FOLLOWING_URL;
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.LOCATION;
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.NAME;
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.PHOTO;
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.REPOS;
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.URL;
-import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns.USERNAME;
+import static com.hryzx.submissiongithubuser3.database.UserContract.UserColumns;
 
 public class MappingHelper {
     public static ArrayList<User> mapCursorToArrayList(Cursor userCursor) {
@@ -28,21 +14,21 @@ public class MappingHelper {
         while (userCursor.moveToNext()) {
             User user = new User();
 
-            user.setId(userCursor.getInt(userCursor.getColumnIndexOrThrow(_ID)));
-            user.setUrl(userCursor.getString(userCursor.getColumnIndexOrThrow(URL)));
-            user.setName(userCursor.getString(userCursor.getColumnIndexOrThrow(NAME)));
-            user.setUsername(userCursor.getString(userCursor.getColumnIndexOrThrow(USERNAME)));
-            user.setDescription(userCursor.getString(userCursor.getColumnIndexOrThrow(DESCRIPTION)));
-            user.setLocation(userCursor.getString(userCursor.getColumnIndexOrThrow(LOCATION)));
-            user.setPhoto(userCursor.getString(userCursor.getColumnIndexOrThrow(PHOTO)));
-            user.setFollowing(userCursor.getString(userCursor.getColumnIndexOrThrow(FOLLOWING)));
-            user.setFollowers(userCursor.getString(userCursor.getColumnIndexOrThrow(FOLLOWERS)));
-            user.setFollowers_url(userCursor.getString(userCursor.getColumnIndexOrThrow(FOLLOWERS_URL)));
-            user.setFollowing_url(userCursor.getString(userCursor.getColumnIndexOrThrow(FOLLOWING_URL)));
-            user.setRepos(userCursor.getString(userCursor.getColumnIndexOrThrow(REPOS)));
-            user.setCompany(userCursor.getString(userCursor.getColumnIndexOrThrow(COMPANY)));
-            user.setBlog(userCursor.getString(userCursor.getColumnIndexOrThrow(BLOG)));
-            user.setEmail(userCursor.getString(userCursor.getColumnIndexOrThrow(EMAIL)));
+            user.setId(userCursor.getInt(userCursor.getColumnIndexOrThrow(UserColumns.ID)));
+            user.setUrl(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.URL)));
+            user.setName(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.NAME)));
+            user.setUsername(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.USERNAME)));
+            user.setDescription(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.DESCRIPTION)));
+            user.setLocation(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.LOCATION)));
+            user.setPhoto(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.PHOTO)));
+            user.setFollowing(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.FOLLOWING)));
+            user.setFollowers(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.FOLLOWERS)));
+            user.setFollowers_url(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.FOLLOWERS_URL)));
+            user.setFollowing_url(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.FOLLOWING_URL)));
+            user.setRepos(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.REPOS)));
+            user.setCompany(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.COMPANY)));
+            user.setBlog(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.BLOG)));
+            user.setEmail(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.EMAIL)));
             users.add(user);
         }
         return users;
@@ -52,21 +38,21 @@ public class MappingHelper {
         userCursor.moveToFirst();
         User user = new User();
 
-        user.setId(userCursor.getInt(userCursor.getColumnIndexOrThrow(_ID)));
-        user.setUrl(userCursor.getString(userCursor.getColumnIndexOrThrow(URL)));
-        user.setName(userCursor.getString(userCursor.getColumnIndexOrThrow(NAME)));
-        user.setUsername(userCursor.getString(userCursor.getColumnIndexOrThrow(USERNAME)));
-        user.setDescription(userCursor.getString(userCursor.getColumnIndexOrThrow(DESCRIPTION)));
-        user.setLocation(userCursor.getString(userCursor.getColumnIndexOrThrow(LOCATION)));
-        user.setPhoto(userCursor.getString(userCursor.getColumnIndexOrThrow(PHOTO)));
-        user.setFollowing(userCursor.getString(userCursor.getColumnIndexOrThrow(FOLLOWING)));
-        user.setFollowers(userCursor.getString(userCursor.getColumnIndexOrThrow(FOLLOWERS)));
-        user.setFollowers_url(userCursor.getString(userCursor.getColumnIndexOrThrow(FOLLOWERS_URL)));
-        user.setFollowing_url(userCursor.getString(userCursor.getColumnIndexOrThrow(FOLLOWING_URL)));
-        user.setRepos(userCursor.getString(userCursor.getColumnIndexOrThrow(REPOS)));
-        user.setCompany(userCursor.getString(userCursor.getColumnIndexOrThrow(COMPANY)));
-        user.setBlog(userCursor.getString(userCursor.getColumnIndexOrThrow(BLOG)));
-        user.setEmail(userCursor.getString(userCursor.getColumnIndexOrThrow(EMAIL)));
+        user.setId(userCursor.getInt(userCursor.getColumnIndexOrThrow(UserColumns.ID)));
+        user.setUrl(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.URL)));
+        user.setName(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.NAME)));
+        user.setUsername(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.USERNAME)));
+        user.setDescription(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.DESCRIPTION)));
+        user.setLocation(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.LOCATION)));
+        user.setPhoto(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.PHOTO)));
+        user.setFollowing(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.FOLLOWING)));
+        user.setFollowers(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.FOLLOWERS)));
+        user.setFollowers_url(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.FOLLOWERS_URL)));
+        user.setFollowing_url(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.FOLLOWING_URL)));
+        user.setRepos(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.REPOS)));
+        user.setCompany(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.COMPANY)));
+        user.setBlog(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.BLOG)));
+        user.setEmail(userCursor.getString(userCursor.getColumnIndexOrThrow(UserColumns.EMAIL)));
 
         return user;
     }
